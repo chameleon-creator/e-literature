@@ -3,11 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lila's Light - Chapter 2</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Lila's Light - The Girl and the Garden</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #252525 0%, #353535 50%, #252525 100%);
+            color: #999;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Subtle texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 30% 40%, rgba(255,255,255,0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Soil texture at bottom */
+        .soil-layer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(180deg, 
+                transparent 0%,
+                rgba(40, 35, 30, 0.3) 30%,
+                rgba(45, 40, 35, 0.5) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .story-page {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        p {
+            font-size: 1.7rem;
+            line-height: 1.8;
+            margin: 2rem 0;
+            opacity: 0;
+            transform: translateY(30px);
+            letter-spacing: 0.5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 300;
+        }
+
+        p.fade-in {
+            animation: fadeInUp 2s ease-out forwards;
+        }
+
+        p:nth-child(1) { animation-delay: 0.5s; }
+        p:nth-child(2) { animation-delay: 2.5s; }
+        p:nth-child(3) { animation-delay: 4.5s; }
+        p:nth-child(4) { animation-delay: 6.5s; }
+        p:nth-child(6) { animation-delay: 10s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Garden container */
+        .garden {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4rem;
+            margin: 4rem 0;
+            padding: 3rem 0;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 2s ease-out forwards;
+            animation-delay: 8.5s;
+            min-height: 250px;
+        }
+
+        /* Individual flower */
+        .flower {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .flower:hover {
+            transform: scale(1.1);
+        }
+
+        /* Flower stem */
+        .flower::before {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 80px;
+            background: linear-gradient(180deg, #555 0%, #444 100%);
+            border-radius: 2px;
+        }
+
+        /* Flower center */
+        .flower::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #666 0%, #555 100%);
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Petals */
+        .petal {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background: linear-gradient(135deg, #777 0%, #666 50%, #555 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            top: 50%;
+            left: 50%;
+            transform-origin: center bottom;
+            transition: all 0.6s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .petal:nth-child(1) {
+            transform: translate(-50%, -50%) rotate(0deg) translateY(-25px);
+        }
+
+        .petal:nth-child(2) {
+            transform: translate(-50%, -50%) rotate(90deg) translateY(-25px);
+        }
+
+        .petal:nth-child(3) {
+            transform: translate(-50%, -50%) rotate(180deg) translateY(-25px);
+        }
+
+        .petal:nth-child(4) {
+            transform: translate(-50%, -50%) rotate(270deg) translateY(-25px);
+        }
+
+        /* Color reveal on hover */
+        .flower:hover .petal {
+            animation: colorPulse 1.5s ease-in-out;
+        }
+
+        .flower:nth-child(1):hover .petal {
+            animation: colorPulseRose 1.5s ease-in-out;
+        }
+
+        .flower:nth-child(2):hover .petal {
+            animation: colorPulseViolet 1.5s ease-in-out;
+        }
+
+        .flower:nth-child(3):hover .petal {
+            animation: colorPulseGold 1.5s ease-in-out;
+        }
+
+        @keyframes colorPulseRose {
+            0%, 100% {
+                background: linear-gradient(135deg, #777 0%, #666 50%, #555 100%);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                background: linear-gradient(135deg, #ff6b9d 0%, #ff8fab 50%, #ffb3c6 100%);
+                box-shadow: 0 0 25px rgba(255, 107, 157, 0.6);
+            }
+        }
+
+        @keyframes colorPulseViolet {
+            0%, 100% {
+                background: linear-gradient(135deg, #777 0%, #666 50%, #555 100%);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                background: linear-gradient(135deg, #9b6bff 0%, #b48fff 50%, #d4b3ff 100%);
+                box-shadow: 0 0 25px rgba(155, 107, 255, 0.6);
+            }
+        }
+
+        @keyframes colorPulseGold {
+            0%, 100% {
+                background: linear-gradient(135deg, #777 0%, #666 50%, #555 100%);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #fff5a0 100%);
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        .flower:hover::after {
+            animation: centerGlow 1.5s ease-in-out;
+        }
+
+        @keyframes centerGlow {
+            50% {
+                background: radial-gradient(circle, #ffe4b5 0%, #ffd700 100%);
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        /* Leaves */
+        .flower .leaf {
+            position: absolute;
+            width: 25px;
+            height: 40px;
+            background: linear-gradient(135deg, #5a5a5a 0%, #4a4a4a 100%);
+            border-radius: 0 50% 50% 0;
+            bottom: -40px;
+        }
+
+        .next-page-link {
+            display: inline-block;
+            margin-top: 3rem;
+            padding: 1rem 2.5rem;
+            color: #999;
+            text-decoration: none;
+            border: 2px solid #555;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 2s ease-out forwards;
+            animation-delay: 11.5s;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+        }
+
+        .next-page-link:hover {
+            color: #ccc;
+            border-color: #888;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Audio control */
+        .audio-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 1s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .audio-control:hover {
+            border-color: #888;
+            background: rgba(50, 50, 50, 0.9);
+            transform: scale(1.1);
+        }
+
+        .audio-control::before {
+            content: '🔊';
+            font-size: 1.3rem;
+            filter: grayscale(1);
+        }
+
+        .audio-control.muted::before {
+            content: '🔇';
+        }
+
+        /* Hint text */
+        .hint {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeIn 2s ease-out forwards;
+            animation-delay: 10s;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            p {
+                font-size: 1.3rem;
+                margin: 1.5rem 0;
+            }
+            
+            .garden {
+                gap: 2rem;
+                min-height: 200px;
+            }
+            
+            .flower::before {
+                height: 60px;
+                bottom: -60px;
+            }
+            
+            .petal {
+                width: 30px;
+                height: 45px;
+            }
+            
+            .next-page-link {
+                font-size: 1rem;
+                padding: 0.8rem 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-
+    <div class="soil-layer"></div>
+    
     <main>
         <section class="story-page">
             <p class="fade-in">This is the story of my daughter, Lila.</p>
@@ -16,36 +373,86 @@
             <p class="fade-in">But the flowers that bloomed were pale, their petals the color of ash, as if they too were holding their breath.</p>
             
             <div class="garden fade-in">
-    <div class="flower">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-    </div>
-    <div class="flower">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-    </div>
-    <div class="flower">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-    </div>
-</div>
-
+                <div class="flower">
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                </div>
+                <div class="flower">
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                </div>
+                <div class="flower">
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                    <div class="petal"></div>
+                </div>
+                <span class="hint">Hover over the flowers...</span>
+            </div>
+            
             <p class="fade-in">Still, she did not give up.</p>
             
-            <a href="page3.html" class="next-page-link fade-in">Next Chapter →</a>
+            <a href="page3.html" class="next-page-link">Next Chapter →</a>
         </section>
     </main>
+
+    <div class="audio-control" id="audioToggle"></div>
 
     <audio id="bg-music" loop>
         <source src="audio/sad-piano.mp3" type="audio/mpeg">
     </audio>
 
-    <script src="script.js"></script>
+    <script>
+        // Audio control
+        const audio = document.getElementById('bg-music');
+        const audioToggle = document.getElementById('audioToggle');
+        let isPlaying = false;
+
+        audioToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioToggle.classList.add('muted');
+            } else {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                audioToggle.classList.remove('muted');
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Auto-play attempt
+        document.addEventListener('click', () => {
+            if (!isPlaying) {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                audioToggle.classList.remove('muted');
+                isPlaying = true;
+            }
+        }, { once: true });
+
+        // Add touch support for mobile
+        const flowers = document.querySelectorAll('.flower');
+        flowers.forEach(flower => {
+            flower.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                flower.style.transform = 'scale(1.1)';
+                
+                // Trigger color animation
+                const petals = flower.querySelectorAll('.petal');
+                petals.forEach(petal => {
+                    petal.style.animation = 'none';
+                    setTimeout(() => {
+                        petal.style.animation = '';
+                    }, 10);
+                });
+            });
+            
+            flower.addEventListener('touchend', () => {
+                flower.style.transform = '';
+            });
+        });
+    </script>
 </body>
 </html>
