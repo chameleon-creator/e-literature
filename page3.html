@@ -1,1 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lila's Light - A Promise to a Photograph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%);
+            color: #aaa;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 40% 30%, rgba(255,255,255,0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 70%, rgba(255,255,255,0.03) 0%, transparent 50%);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .story-page {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        p {
+            font-size: 1.7rem;
+            line-height: 1.8;
+            margin: 2rem 0;
+            opacity: 0;
+            transform: translateY(30px);
+            letter-spacing: 0.5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 300;
+        }
+
+        p.fade-in {
+            animation: fadeInUp 2s ease-out forwards;
+        }
+
+        p:nth-child(1) { animation-delay: 0.5s; }
+        p:nth-child(2) { animation-delay: 2.5s; }
+        p:nth-child(4) { animation-delay: 8s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Photo container */
+        #photo-container {
+            position: relative;
+            width: 450px;
+            height: 550px;
+            margin: 3rem auto;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 2s ease-out forwards;
+            animation-delay: 4.5s;
+            perspective: 1000px;
+        }
+
+        /* Frame */
+        .photo-frame {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+            border-radius: 8px;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.6),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+            padding: 25px;
+        }
+
+        /* Photo content area */
+        .photo-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Base image - grayscale */
+        .photo-base {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) brightness(0.6) contrast(0.9);
+            transition: filter 0.6s ease;
+        }
+
+        /* Color overlay image */
+        .photo-color {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+            mix-blend-mode: normal;
+        }
+
+        /* Specific color highlights that will flash */
+        .color-highlights {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            background: radial-gradient(
+                circle at 50% 30%,
+                rgba(255, 200, 150, 0.3) 0%,
+                transparent 30%
+            );
+        }
+
+        /* Flash effect */
+        #photo-container.flash .photo-color {
+            animation: colorFlash 1.4s ease-in-out;
+        }
+
+        #photo-container.flash .color-highlights {
+            animation: highlightFlash 1.4s ease-in-out;
+        }
+
+        @keyframes colorFlash {
+            0% { opacity: 0; }
+            25% { opacity: 0.9; }
+            75% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes highlightFlash {
+            0% { opacity: 0; }
+            30% { opacity: 0.6; }
+            70% { opacity: 0.6; }
+            100% { opacity: 0; }
+        }
+
+        /* Glow effect on frame */
+        #photo-container.flash .photo-frame {
+            animation: frameGlow 1.4s ease-in-out;
+        }
+
+        @keyframes frameGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 10px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 80px rgba(255, 200, 100, 0.5),
+                    0 10px 40px rgba(255, 150, 50, 0.4),
+                    inset 0 2px 4px rgba(255, 200, 150, 0.3);
+            }
+        }
+
+        /* Light burst effect */
+        .light-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+            background: radial-gradient(
+                circle,
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 200, 150, 0.2) 20%,
+                transparent 60%
+            );
+        }
+
+        #photo-container.flash .light-burst {
+            animation: burstFlash 1.4s ease-in-out;
+        }
+
+        @keyframes burstFlash {
+            0%, 100% { 
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% { 
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        /* Hint text */
+        .hint {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.95rem;
+            color: #777;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeIn 2s ease-out forwards;
+            animation-delay: 6.5s;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .next-page-link {
+            display: inline-block;
+            margin-top: 3rem;
+            padding: 1rem 2.5rem;
+            color: #999;
+            text-decoration: none;
+            border: 2px solid #555;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 2s ease-out forwards;
+            animation-delay: 9.5s;
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+        }
+
+        .next-page-link:hover {
+            color: #ccc;
+            border-color: #888;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Audio control */
+        .audio-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 100;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 1s;
+        }
+
+        .audio-control:hover {
+            border-color: #888;
+            background: rgba(50, 50, 50, 0.9);
+            transform: scale(1.1);
+        }
+
+        .audio-control::before {
+            content: '🔊';
+            font-size: 1.3rem;
+            filter: grayscale(1);
+        }
+
+        .audio-control.muted::before {
+            content: '🔇';
+        }
+
+        @media (max-width: 768px) {
+            p {
+                font-size: 1.3rem;
+                margin: 1.5rem 0;
+            }
+            
+            #photo-container {
+                width: 320px;
+                height: 400px;
+            }
+            
+            .next-page-link {
+                font-size: 1rem;
+                padding: 0.8rem 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="story-page">
+            <p class="fade-in">On the mantelpiece sat a photograph of her aunt, taken on a bright summer day before the Veil.</p>
+            <p class="fade-in">Lila would trace the glass with her small finger. She missed that smile, the light in her eyes, the bright red scarf her aunt always wore.</p>
+            
+            <div id="photo-container" class="fade-in">
+                <div class="photo-frame">
+                    <div class="photo-content">
+                        <!-- Grayscale base image -->
+                        <img src="images/smilinglady.jpeg" alt="Faded photograph" class="photo-base">
+                        
+                        <!-- Color version that flashes -->
+                        <img src="images/smilinglady.jpeg" alt="Colorful memory" class="photo-color">
+                        
+                        <!-- Light burst effect -->
+                        <div class="light-burst"></div>
+                        
+                        <!-- Color highlights -->
+                        <div class="color-highlights"></div>
+                    </div>
+                </div>
+                <span class="hint">Click the photograph...</span>
+            </div>
+            
+            <p class="fade-in">"I'll bring the colors back," she whispered to the fading memory. "I promise."</p>
+            
+            <a href="page4.html" class="next-page-link">Next Chapter →</a>
+        </section>
+    </main>
+
+    <div class="audio-control" id="audioToggle"></div>
+
+    <audio id="bg-music" loop>
+        <source src="audio/sad-piano.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Audio control
+        const audio = document.getElementById('bg-music');
+        const audioToggle = document.getElementById('audioToggle');
+        let isPlaying = false;
+
+        audioToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                audio.pause();
+                audioToggle.classList.add('muted');
+            } else {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                audioToggle.classList.remove('muted');
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Auto-play attempt
+        document.addEventListener('click', () => {
+            if (!isPlaying) {
+                audio.play().catch(e => console.log('Audio play failed:', e));
+                audioToggle.classList.remove('muted');
+                isPlaying = true;
+            }
+        }, { once: true });
+
+        // Photo interaction
+        const photoContainer = document.getElementById('photo-container');
+        
+        photoContainer.addEventListener('click', () => {
+            // Remove any existing flash class
+            photoContainer.classList.remove('flash');
+            
+            // Trigger reflow to restart animation
+            void photoContainer.offsetWidth;
+            
+            // Add flash class
+            photoContainer.classList.add('flash');
+            
+            // Remove class after animation completes
+            setTimeout(() => {
+                photoContainer.classList.remove('flash');
+            }, 1400);
+        });
+
+        // Touch support for mobile
+        photoContainer.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            photoContainer.click();
+        });
+    </script>
+</body>
+</html>
